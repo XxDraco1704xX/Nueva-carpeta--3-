@@ -27,8 +27,17 @@ class Climate(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api_key = Config.OPENWEATHER_API
-        self.extreme_weather_check.start()
+        self.scheduler = AsyncIOScheduler()
         self.co2_levels_cache = None
+
+    async def on_ready(self):
+       
+       print("Bot listo, iniciando scheduler")
+      
+       if not self.extreme_weather_check.is_running():
+          self.extreme_weather_check.start()
+       if not self.scheduler.running:
+           self.scheduler.start()
 
     def cog_unload(self):
         self.extreme_weather_check.cancel()
@@ -140,6 +149,65 @@ class Climate(commands.Cog):
         embed.set_footer(text="Fuente: NASA Climate Change "
                          "| Última actualización: Hoy")
         await ctx.send(embed=embed)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Fase 4: Sistema de Notificaciones (Día 11-12)
 
@@ -391,12 +459,11 @@ class RateLimiter:
         self.call_times = [
             t for t in self.call_times 
             if now - t < self.period
-        ] 
+        ]        
         if len(self.call_times) >= self.calls:
             sleep_time = self.period - (now - self.call_times[0])
             if sleep_time > 0:
                 await asyncio.sleep(sleep_time)
-                return await self.check()
-              
+                return await self.check()         
         self.call_times.append(now)
         return True
